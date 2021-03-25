@@ -21,3 +21,5 @@ data_2014$dayofweek <- factor(wday(data_2014$Date.Time, label = TRUE))
 data_2014$hour <- factor(hour(hms(data_2014$Time)))
 data_2014$minute <- factor(minute(hms(data_2014$Time)))
 data_2014$second <- factor(second(hms(data_2014$Time)))
+
+head(data_2014)
