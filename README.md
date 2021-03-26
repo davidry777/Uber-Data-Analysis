@@ -71,12 +71,17 @@ ggplot(hour_data, aes(hour, Total)) +
     ggtitle("Trips Every Hour") +
       theme(legend.position = "none") +
       scale_y_continuous(label = comma)
+      
+month_hour <- data_2014 %>%
+  group_by(month, hour) %>%
+    dplyr::summarize(Total = n())
+
+ggplot(month_hour, aes(hour, Total, fill = month)) +
+  geom_bar(stat = "identity") +
+    ggtitle("Trips by Hour and Month") +
+      scale_y_continuous(label = comma)
 ```
-### Data Table:
-
-<img width="721" alt="Screen Shot 2021-03-25 at 12 54 03 PM" src="https://user-images.githubusercontent.com/42628566/112535197-3a0dd680-8d69-11eb-92f2-a3cde9bf080f.png">
-
-### Bar Plot for Trips Every Hour in a Day
+### Bar Plots for Trips Every Hour in a Day
 
 ![Trips Every Hour](https://github.com/davidry777/Uber-Data-Analysis/blob/main/Images/Rplot01.png)
 
@@ -84,4 +89,31 @@ ggplot(hour_data, aes(hour, Total)) +
 
 Based on the following plots, we observe that the highest number of trips occur in the 17-18th hour, which in Eastern Time is 5-6 pm. We can assume that the reason for this high number of trips is because 5-6 pm in NYC is the time that adult business workers leave the office.
 
-## Analysis of Trips 
+## Analysis of Trips by Days in a Week
+### Code:
+```day_group <- data_2014 %>%
+  group_by(day) %>%
+    dplyr::summarize(Total = n())
+datatable(day_group)
+
+ggplot(day_group, aes(day, Total)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+    ggtitle("Trips Every Day") +
+      theme(legend.position = "none") +
+      scale_y_continuous(labels = comma)
+
+day_month_group <- data_2014 %>%
+  group_by(month, day) %>%
+    dplyr::summarize(Total = n())
+
+ggplot(day_month_group, aes(day, Total, fill = month)) + 
+  geom_bar(stat = "identity") +
+    ggtitle("Trips by Day and Month") +
+      scale_y_continuous(labels = comma) +
+      scale_fill_manual(values = colors)
+```
+### Bar Plots for Trips Every Day in a Week
+
+![Trips Every Day](https://github.com/davidry777/Uber-Data-Analysis/blob/main/Images/Rplot03.png)
+
+![Trips Every Day By Month](https://github.com/davidry777/Uber-Data-Analysis/blob/main/Images/Rplot04.png)
