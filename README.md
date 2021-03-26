@@ -3,7 +3,7 @@
 ## Description
 This data analysis project is meant to analyze raw data of Uber pickups in New York City from April to September 2014. The plotting of datasets is done through the R programming language, using the following libraries: ggplot2, ggthemes, lubridate, dplyr, tidyr, DT, and scales.
 
-This ![dataset](https://www.kaggle.com/fivethirtyeight/uber-pickups-in-new-york-city) was published by FiveThirtyEighty, who obtained the data from the NYC Taxi & Limousine Commission (TLC). There are six raw data files, separated into months:
+This [dataset](https://www.kaggle.com/fivethirtyeight/uber-pickups-in-new-york-city) was published by FiveThirtyEighty, who obtained the data from the NYC Taxi & Limousine Commission (TLC). There are six raw data files, separated into months:
 * `uber-raw-data-apr14.csv`
 * `uber-raw-data-may14.csv`
 * `uber-raw-data-jun14.csv`
@@ -87,7 +87,7 @@ ggplot(month_hour, aes(hour, Total, fill = month)) +
 
 ![Trips Every Hour By Month](https://github.com/davidry777/Uber-Data-Analysis/blob/main/Images/Rplot02.png)
 
-Based on the following plots, we observe that the highest number of trips occur in the 17-18th hour, which in Eastern Time is 5-6 pm. We can assume that the reason for this high number of trips is because 5-6 pm in NYC is the time that adult business workers leave the office.
+Based on these plots, we observe that the highest number of trips occur in the 17-18th hour, which in Eastern Time is 5-6 pm. We can assume that the reason for this high number of trips is because 5-6 pm in NYC is the time that adult business workers leave the office.
 
 ## Analysis of Trips by Days in a Week
 ### Code:
@@ -112,8 +112,138 @@ ggplot(day_month_group, aes(day, Total, fill = month)) +
       scale_y_continuous(labels = comma) +
       scale_fill_manual(values = colors)
 ```
-### Bar Plots for Trips Every Day in a Week
+### Bar Plots for Trips Every Day of the Month
 
 ![Trips Every Day](https://github.com/davidry777/Uber-Data-Analysis/blob/main/Images/Rplot03.png)
 
 ![Trips Every Day By Month](https://github.com/davidry777/Uber-Data-Analysis/blob/main/Images/Rplot04.png)
+
+Based on these plots, we observe that the 30th day of the month had the highest number of trips. It's also interesting to point out that majority of these trips occurred on April 30th. 
+
+## Analysis of Trips by Months in a Year
+### Code:
+```month_group <- data_2014 %>%
+  group_by(month) %>%
+    dplyr::summarize(Total = n())
+datatable(month_group)
+
+ggplot(month_group, aes(month, Total, fill = month)) + 
+  geom_bar( stat = "identity") +
+    ggtitle("Trips by Month") +
+      theme(legend.position = "none") +
+      scale_y_continuous(labels = comma) +
+      scale_fill_manual(values = colors)
+
+month_weekday <- data_2014 %>%
+  group_by(month, dayofweek) %>%
+    dplyr::summarize(Total = n())
+
+ggplot(month_weekday, aes(month, Total, fill = dayofweek)) + 
+  geom_bar(stat = "identity", position = "dodge") +
+    ggtitle("Trips by Day and Month") +
+      scale_y_continuous(labels = comma) +
+      scale_fill_manual(values = colors)
+```
+### Bar Plots for Trips Every Month
+![Trips Every Month](https://github.com/davidry777/Uber-Data-Analysis/blob/main/Images/Rplot05.png)
+
+![Trips Every Month By Day](https://github.com/davidry777/Uber-Data-Analysis/blob/main/Images/Rplot06.png)
+
+Looking at these plots, we observe that the most popular month for trips is September. Furthermore, each of the days in September are higher than the days for the other months. A reason to this could be that September is a very popular month for tourism, leading to a greater number of trips.
+
+## Analysis of Trips by Bases
+### Code:
+```ggplot(data_2014, aes(Base)) +
+  geom_bar(fill = "darkblue") +
+    scale_y_continuous(labels = comma) +
+    ggtitle("Trips By Bases")
+    
+ggplot(data_2014, aes(Base, fill = month)) +
+  geom_bar(position = "dodge") +
+    scale_y_continuous(labels = comma) +
+    ggtitle("Trips by Bases and Month") +
+    scale_fill_manual(values = colors)
+
+ggplot(data_2014, aes(Base, fill = dayofweek)) +
+  geom_bar(position = "dodge") +
+    scale_y_continuous(labels = comma) +
+    ggtitle("Trips by Bases and DayofWeek") +
+    scale_fill_manual(values = colors)
+```
+### Bar Plots for Trips Every Base
+![Trips Every Base](https://github.com/davidry777/Uber-Data-Analysis/blob/main/Images/Rplot07.png)
+
+![Trips Every Base By Month](https://github.com/davidry777/Uber-Data-Analysis/blob/main/Images/Rplot08.png)
+
+![Trips Every Base By Day of Week](https://github.com/davidry777/Uber-Data-Analysis/blob/main/Images/Rplot09.png)
+
+When observing these plots, we can see that the most popular Uber base for trips is B02617, otherwise known as Weiter. Base Weiter had a greater number of trips in September, therefore connecting the base to tourism in NYC. We can also see that the trips per day in each base are consistent, with Thursday mostly popular for trips.
+
+## Heat maps
+### Code:
+```day_and_hour <- data_2014 %>%
+  group_by(day, hour) %>%
+    dplyr::summarize(Total = n())
+datatable(day_and_hour)
+
+ggplot(day_and_hour, aes(day, hour, fill = Total)) +
+  geom_tile(color = "white") +
+    ggtitle("Heat Map by Hour and Day")
+
+ggplot(day_month_group, aes(day, month, fill = Total)) +
+  geom_tile(color = "white") +
+    ggtitle("Heat Map by Month and Day")
+
+ggplot(month_weekday, aes(dayofweek, month, fill = Total)) +
+  geom_tile(color = "white") +
+    ggtitle("Heat Map by Month and Day of Week")
+
+month_base <-  data_2014 %>%
+  group_by(Base, month) %>%
+    dplyr::summarize(Total = n()) 
+
+day0fweek_bases <-  data_2014 %>%
+  group_by(Base, dayofweek) %>%
+    dplyr::summarize(Total = n()) 
+
+ggplot(month_base, aes(Base, month, fill = Total)) +
+  geom_tile(color = "white") +
+    ggtitle("Heat Map by Month and Bases")
+
+ggplot(day0fweek_bases, aes(Base, dayofweek, fill = Total)) +
+  geom_tile(color = "white") +
+    ggtitle("Heat Map by Bases and Day of Week")
+```
+    
+![Heat map 1](https://github.com/davidry777/Uber-Data-Analysis/blob/main/Images/Rplot10.png)
+
+![Heat map 2](https://github.com/davidry777/Uber-Data-Analysis/blob/main/Images/Rplot11.png)
+
+![Heat map 3](https://github.com/davidry777/Uber-Data-Analysis/blob/main/Images/Rplot12.png)
+
+![Heat map 4](https://github.com/davidry777/Uber-Data-Analysis/blob/main/Images/Rplot13.png)
+
+![Heat map 5](https://github.com/davidry777/Uber-Data-Analysis/blob/main/Images/Rplot14.png)
+
+## Visualizations of Rides in NYC
+### Code:
+```ggplot(data_2014, aes(x=Lon, y=Lat)) +
+  geom_point(size=1, color = "blue") +
+    scale_x_continuous(limits=c(min_long, max_long)) +
+      scale_y_continuous(limits=c(min_lat, max_lat)) +
+        theme_map() +
+          ggtitle("NYC MAP BASED ON UBER RIDES DURING 2014 (APR-SEP)")
+
+ggplot(data_2014, aes(x=Lon, y=Lat, color = Base)) +
+  geom_point(size=1) +
+    scale_x_continuous(limits=c(min_long, max_long)) +
+      scale_y_continuous(limits=c(min_lat, max_lat)) +
+        theme_map() +
+          ggtitle("NYC MAP BASED ON UBER RIDES DURING 2014 (APR-SEP) by BASE")
+```
+![NYC Visualization 1](https://github.com/davidry777/Uber-Data-Analysis/blob/main/Images/Rplot15.png)
+
+![NYC Visualization 2](https://github.com/davidry777/Uber-Data-Analysis/blob/main/Images/Rplot16.png)
+
+## Conclusion
+Based off the data plots and visualizations, we can conclude that Uber is a popular consumer service for both NYC civilians and tourism, therefore making Uber the more successful transportation service in NYC, compared to other services like the NYC Taxi Service.
